@@ -1,6 +1,8 @@
 from lxml import html
 import json
 import configparser
+import psycopg2
+import os
 from utils.print import open_html
 
 
@@ -42,32 +44,49 @@ class DataManager:
         return grades
 
     @staticmethod
-    def _load_grades(name):
-        file = open('usosfetch/grades/' + name + '.json', 'r')
+    def _load_grades():
 
-        result = json.load(file)
+        db = psycopg2.connect(os.environ['DATABASE_URL'], sslmode='require')
 
-        file.close()
+        cursor = db.cursor()
 
-        return result
+        cursor.execute("""SELECT * FROM Grades""")
+
+        result = cursor.fetchall()
+
+        cursor.close()
+        db.close()
+
+        return list(map(lambda n_s: (n_s[0], json.loads(n_s[1])), result))
 
     @staticmethod
-    def _save_grades(name, grades):
-        file = open('usosfetch/grades/' + name + '.json', 'w')
+    def _save_grades(set_name, grades, cursor):
 
-        file.write(json.dumps(grades))
+        new_grades = json.dumps(grades)
 
-        file.close()
+        cursor.execute("""UPDATE Grades SET List = %s WHERE ID = %s""", (new_grades, set_name))
 
     def get_new_grades(self):
         return list(map(lambda n_t: (n_t[0], self._parse_grade_tree(n_t[1])), self._get_grade_trees()))
 
     def get_old_grades(self):
-        return list(map(lambda n_u: (n_u[0], self._load_grades(n_u[0])), self._urls))
+        names = list(map(lambda n_u: n_u[0], self._urls))
+
+        return list(filter(lambda n_l: n_l[0] in names, self._load_grades()))
 
     def save_grades(self, grades_list):
+
+        db = psycopg2.connect(os.environ['DATABASE_URL'], sslmode='require')
+
+        cursor = db.cursor()
+
         for (name, grades) in grades_list:
-            self._save_grades(name, grades)
+            self._save_grades(name, grades, cursor)
+
+        db.commit()
+
+        cursor.close()
+        db.close()
 
     @staticmethod
     def get_differences(old_grades, new_grades):

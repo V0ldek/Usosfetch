@@ -1,10 +1,8 @@
 import requests
+import os
 from usosfetch.authorizer import Authorizer
 from usosfetch.data_manager import DataManager
 from usosfetch.notifier import Notifier
-
-USERNAME = '98041603555'
-PASSWORD = 'tghfhgh.q47$&'
 
 EMAIL = 'matgienieczko@gmail.com'
 
@@ -18,7 +16,7 @@ def main():
         notifier = Notifier(EMAIL)
 
         try:
-            authorizer.login(USERNAME, PASSWORD)
+            authorizer.login(os.environ["USOS_USERNAME"], os.environ["USOS_PASSWORD"])
 
             old_grades = data_manager.get_old_grades()
             new_grades = data_manager.get_new_grades()
