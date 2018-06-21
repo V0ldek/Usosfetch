@@ -1,12 +1,13 @@
 from lxml import html
 from configparser import ConfigParser
 
+
 class Authorizer:
 
     _login_payload = {
         '_eventId': 'submit',
         'execution': 'e1s1',
-        'lt': 'LT-1900442-SgvKm4e272r6NhfeOK0JI9lHFrBs5B',
+        'lt': '',
         'password': '',
         'submit': 'ZALOGUJ',
         'username': ''
