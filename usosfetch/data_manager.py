@@ -72,8 +72,6 @@ class DataManager:
     def get_old_grades(self):
         names = list(map(lambda n_u: n_u[0], self._urls))
 
-        print("NAMES = " + str(names))
-
         return list(filter(lambda n_l: n_l[0] in names, self._load_grades()))
 
     def save_grades(self, grades_list):

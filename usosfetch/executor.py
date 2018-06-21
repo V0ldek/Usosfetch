@@ -4,8 +4,6 @@ from usosfetch.authorizer import Authorizer
 from usosfetch.data_manager import DataManager
 from usosfetch.notifier import Notifier
 
-EMAIL = 'matgienieczko@gmail.com'
-
 
 def main():
 
@@ -13,7 +11,7 @@ def main():
 
         authorizer = Authorizer(session)
         data_manager = DataManager(session)
-        notifier = Notifier(EMAIL)
+        notifier = Notifier(os.environ['RECEIVER_EMAIL'])
 
         try:
             authorizer.login(os.environ["USOS_USERNAME"], os.environ["USOS_PASSWORD"])

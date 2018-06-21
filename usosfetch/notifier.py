@@ -1,8 +1,6 @@
 import smtplib
+import os
 from email.mime.text import MIMEText
-
-USERNAME = 'usosfetch.py.smtp@gmail.com'
-PASSWORD = 'aGHP7r3aL7WCNFzz'
 
 
 class Notifier:
@@ -17,7 +15,7 @@ class Notifier:
         msg = MIMEText('You have new grades in: ' + str(data) + '!\n')
 
         msg['Subject'] = 'New grades in ' + str(data) + '!'
-        msg['From'] = USERNAME
+        msg['From'] = os.environ['NOTIFIER_USERNAME']
         msg['To'] = self._email
 
         return msg
@@ -28,5 +26,5 @@ class Notifier:
 
         smtp = smtplib.SMTP('smtp.gmail.com', 587)
         smtp.starttls()
-        smtp.login(USERNAME, PASSWORD)
-        smtp.sendmail(USERNAME, [self._email], msg.as_string())
+        smtp.login(os.environ['NOTIFIER_USERNAME'], os.environ['NOTIFIER_PASSWORD'])
+        smtp.sendmail(os.environ['NOTIFIER_USERNAME'], [self._email], msg.as_string())
