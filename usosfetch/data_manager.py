@@ -69,12 +69,12 @@ class DataManager:
         cursor.execute("""UPDATE Grades SET List = %s WHERE ID = %s""", (new_grades, set_name))
 
     def get_new_grades(self):
-        return list(map(lambda n_t: (n_t[0], self._parse_grade_tree(n_t[1])), self._get_grade_trees()))
+        return sorted(list(map(lambda n_t: (n_t[0], self._parse_grade_tree(n_t[1])), self._get_grade_trees())))
 
     def get_old_grades(self):
         names = list(map(lambda n_u: n_u[0], self._urls))
 
-        return list(filter(lambda n_l: n_l[0] in names, self._load_grades()))
+        return sorted(list(filter(lambda n_l: n_l[0] in names, self._load_grades())))
 
     def save_grades(self, grades_list):
 
