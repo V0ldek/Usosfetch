@@ -16,10 +16,19 @@ def main():
         try:
             authorizer.login(os.environ["USOS_USERNAME"], os.environ["USOS_PASSWORD"])
 
+            print('Login successful.')
+
             old_grades = data_manager.get_old_grades()
+
+            print('Loaded old grades: ' + str(old_grades))
+
             new_grades = data_manager.get_new_grades()
 
+            print('Fetched new grades: ' + str(new_grades))
+
             data_diff = data_manager.get_differences(old_grades, new_grades)
+
+            print('Differences: ' + str(data_diff))
 
             if data_diff:
                 notifier.notify(data_diff)
@@ -28,6 +37,8 @@ def main():
                 print('Nihil novi.')
 
             data_manager.save_grades(new_grades)
+
+            print('Updated the database.')
 
         finally:
             authorizer.logout()

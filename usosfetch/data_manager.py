@@ -24,6 +24,8 @@ class DataManager:
         if not grade_get_result.ok:
             raise RuntimeError('Failed to fetch grade data for ' + url + ' with code ' + str(grade_get_result.response))
 
+        print('Fetched grades from ' + str(url) + '.')
+
         return html.fromstring(grade_get_result.content)
 
     def _get_grade_trees(self):
