@@ -45,8 +45,11 @@ USOSWeb webpages for my grades). The script performs the following steps:
 6. it stores the newly fetched grades in the database;
 7. it logs out via the `LOGOUT_GET` action.
 
-A sample USOSWeb grades page (the result of a POST specified in course definition looks like this:)
+A sample USOSWeb grades page (the result of a POST specified in course definition looks like this:
+
 ![example screenshot](https://github.com/V0ldek/Usosfetch/tree/master/images/exampleCourse.png "Example course grades GET.")
+
+)
 
 The script (again, not really smart) finds all objects with HTML tag `<td>` and takes data enclosed in tag `<b>` out of it,
 since currently the GET returns a HTML file in which all actual points and grades satisfy this and only them. It then produces
@@ -57,7 +60,9 @@ a list, e.g.:
 which corresponds to three grade fields with the first and third one already filled with 1 and 3 points, respectively.
 
 The email sent by the notifier contains all changed courses' IDs, like this:
+
 ![email screenshot](https://github.com/V0ldek/Usosfetch/tree/master/images/exampleEmail.png "Example email screenshot.")
+
 
 ## Usage
 
