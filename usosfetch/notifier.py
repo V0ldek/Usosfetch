@@ -24,7 +24,7 @@ class Notifier:
 
         msg = self._compose_email(data)
 
-        smtp = smtplib.SMTP('smtp.gmail.com', 587)
+        smtp = smtplib.SMTP(os.environ['SMTP_HOST'], os.environ['SMTP_PORT'])
         smtp.starttls()
         smtp.login(os.environ['NOTIFIER_USERNAME'], os.environ['NOTIFIER_PASSWORD'])
         smtp.sendmail(os.environ['NOTIFIER_USERNAME'], [self._email], msg.as_string())
