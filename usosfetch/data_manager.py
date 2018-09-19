@@ -3,16 +3,17 @@ import json
 import configparser
 import psycopg2
 import os
-from utils.print import open_html
 
 
 class DataManager:
 
     _session = None
     _urls = None
+    _logger = None
 
-    def __init__(self, session):
+    def __init__(self, session, logger):
         self._session = session
+        self._logger = logger
 
         config = configparser.ConfigParser()
         config.read('usosfetch/config.ini')
@@ -22,9 +23,10 @@ class DataManager:
         grade_get_result = self._session.get(url)
 
         if not grade_get_result.ok:
-            raise RuntimeError('Failed to fetch grade data for ' + url + ' with code ' + str(grade_get_result.response))
+            raise RuntimeError('Failed to fetch grade data for ' + url + ' with code ' +
+                               str(grade_get_result().status_code))
 
-        print('Fetched grades from ' + str(url) + '.')
+        self._logger.log('Fetched grades from ' + str(url) + '.')
 
         return html.fromstring(grade_get_result.content)
 
@@ -45,19 +47,20 @@ class DataManager:
 
         return grades
 
-    @staticmethod
-    def _load_grades():
+    def _load_grades(self):
 
-        db = psycopg2.connect(os.environ['DATABASE_URL'], sslmode='require')
+        with psycopg2.connect(os.environ['DATABASE_URL'], sslmode='require') as db, db.cursor() as cursor:
 
-        cursor = db.cursor()
+            for (name, _) in self._urls:
+                cursor.execute("""SELECT count(*) FROM grades WHERE id = %s""", (name,))
+                result = cursor.fetchone()
 
-        cursor.execute("""SELECT * FROM Grades""")
+                if result == (0,):
+                    self._logger.log('Grade ' + name + ' entry not found in the database, inserting a new row.')
+                    cursor.execute("""INSERT INTO grades VALUES (%s, %s)""", (name, '[]'))
 
-        result = cursor.fetchall()
-
-        cursor.close()
-        db.close()
+            cursor.execute("""SELECT * FROM grades""")
+            result = cursor.fetchall()
 
         return list(map(lambda n_s: (n_s[0], json.loads(n_s[1])), result))
 
@@ -66,7 +69,7 @@ class DataManager:
 
         new_grades = json.dumps(grades)
 
-        cursor.execute("""UPDATE Grades SET List = %s WHERE ID = %s""", (new_grades, set_name))
+        cursor.execute("""UPDATE grades SET List = %s WHERE ID = %s""", (new_grades, set_name))
 
     def get_new_grades(self):
         return sorted(list(map(lambda n_t: (n_t[0], self._parse_grade_tree(n_t[1])), self._get_grade_trees())))

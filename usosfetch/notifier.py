@@ -6,9 +6,11 @@ from email.mime.text import MIMEText
 class Notifier:
 
     _email = None
+    _logger = None
 
-    def __init__(self, email):
+    def __init__(self, email, logger):
         self._email = email
+        self._logger = logger
 
     def _compose_email(self, data):
 
@@ -23,6 +25,9 @@ class Notifier:
     def notify(self, data):
 
         msg = self._compose_email(data)
+
+        self._logger.log('Sending an email to ' + self._email + ' via ' +
+                         os.environ['SMTP_HOST'] + ':' + os.environ['SMTP_PORT'])
 
         smtp = smtplib.SMTP(os.environ['SMTP_HOST'], os.environ['SMTP_PORT'])
         smtp.starttls()
