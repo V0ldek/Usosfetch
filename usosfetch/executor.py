@@ -1,44 +1,59 @@
 import requests
 import os
+import traceback
 from usosfetch.authorizer import Authorizer
 from usosfetch.data_manager import DataManager
 from usosfetch.notifier import Notifier
+from usosfetch.logger import Logger
 
 
 def main():
+    logger = Logger()
+    authorizer = None
 
-    with requests.Session() as session:
+    try:
+        logger.begin_session()
 
-        authorizer = Authorizer(session)
-        data_manager = DataManager(session)
-        notifier = Notifier(os.environ['RECEIVER_EMAIL'])
+        notifier = Notifier(os.environ['RECEIVER_EMAIL'], logger)
 
-        try:
+        with requests.Session() as session:
+
+            authorizer = Authorizer(session)
+            data_manager = DataManager(session, logger)
+
             authorizer.login(os.environ["USOS_USERNAME"], os.environ["USOS_PASSWORD"])
 
-            print('Login successful.')
+            logger.log('Login successful.')
 
             old_grades = data_manager.get_old_grades()
 
-            print('Loaded old grades: ' + str(old_grades))
+            logger.log('Loaded old grades: ' + str(old_grades))
 
             new_grades = data_manager.get_new_grades()
 
-            print('Fetched new grades: ' + str(new_grades))
+            logger.log('Fetched new grades: ' + str(new_grades))
 
-            data_diff = data_manager.get_differences(old_grades, new_grades)
+        data_diff = data_manager.get_differences(old_grades, new_grades)
 
-            print('Differences: ' + str(data_diff))
+        if not data_diff:
+            logger.log('Nihil novi.')
+            return 0
 
-            if data_diff:
-                notifier.notify(data_diff)
-                print('New grades!')
-            else:
-                print('Nihil novi.')
+        logger.log('New grades in' + str(data_diff) + '!')
 
-            data_manager.save_grades(new_grades)
+        notifier.notify(data_diff)
 
-            print('Updated the database.')
+        logger.log('Notification sent.')
 
-        finally:
+        data_manager.save_grades(new_grades)
+
+        logger.log('Updated the database.')
+
+    except Exception:
+        logger.error(traceback.format_exc())
+        raise
+    finally:
+        if authorizer is not None:
             authorizer.logout()
+        if logger is not None:
+            logger.save_to_database()
