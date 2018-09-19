@@ -13,7 +13,7 @@ class Logger:
 
     def _log_entry(self, severity, date, message):
         print(severity + ': ' + str(date) + ': ' + str(message))
-        self._log[str(date)] = severity + ':' + str(message)
+        self._log[str(date)] = severity + ': ' + str(message)
 
     def begin_session(self):
         self._log_entry(LOG, datetime.now(), 'Begin log session.')
