@@ -20,16 +20,21 @@ The second one is environment variables. The script expects the following enviro
 - `USOS_USERNAME` - login for CAS authorization;
 - `USOS_PASSWORD` - password for CAS authorization;
 - `RECEIVER_EMAIL` - email to which the notifications will be sent;
-- `NOTIFIER_USERNAME` - login to a notifier-bot GMail account;
-- `NOTIFIER_PASSWORD` - password to a notifier-bot GMail account;
+- `SMTP_HOST` - url for the SMTP host used to push notifications;
+- `SMTP_PORT` - port for the SMTP host used to push notifications;
+- `NOTIFIER_USERNAME` - login to a notifier-bot SMTP account;
+- `NOTIFIER_PASSWORD` - password to a notifier-bot SMTP account;
 - `DATABASE_URL` - connection string to a PostgreSQL database.
 
 ## Database
 
-The database has to accessible via psycopg2 (so PostgreSQL). The script expects a table with name Grades to exist,
-with rows that have the fields:
-- `ID` - corresponding to the course definition's key in `config.ini`;
-- `List` - a CharacterString type that represents a JSON list of all grades in format mentioned below.
+The database has to accessible via psycopg2 (so PostgreSQL). The script expects two tables with names `grades` and `logs` to exist.
+The table `grades` has two columns:
+- `id` - unique `PK`, not null, `VARCHAR` corresponding to the course definition's key in `config.ini`;
+- `list` - not null, `VARCHAR` that represents a JSON list of all grades in the format mentioned below.
+The table `logs` also has two columns:
+- `id` - unique `PK`, not null, `INT` with auto-increment;
+- `log` - not null, `VARCHAR` representing the log. The logs might exceed a couple thousand characters.
 
 ## Behaviour
 
@@ -62,11 +67,20 @@ The email sent by the notifier contains all changed courses' IDs, like this:
 
 ![email screenshot](images/exampleEmail.png "Example email screenshot.")
 
+Logs can be reviewed to investigate the script's behavior. All errors are logged along with the stack-traces in a JSON form:
+
+```json
+{
+    "2018-09-19 21:35:33.022630": "Log: Begin log session.",
+    "2018-09-19 21:35:37.192075": "Log: Login successful.",
+    
+    // ...
+
+    "2018-09-19 21:35:53.477106": "ERROR: Traceback (most recent call last):\n  File \"C:\\Projects\\usosfetch\\usosfetch\\executor.py\", line 32, in main\n    new_grades = data_manager.get_new_grades()\n  File \"C:\\Projects\\usosfetch\\usosfetch\\data_manager.py\", line 75, in get_new_grades\n    return sorted(list(map(lambda n_t: (n_t[0], self._parse_grade_tree(n_t[1])), self._get_grade_trees())))\n  File \"C:\\Projects\\usosfetch\\usosfetch\\data_manager.py\", line 37, in _get_grade_trees\n    trees.append((name, self._get_grade_tree(url)))\n  File \"C:\\Projects\\usosfetch\\usosfetch\\data_manager.py\", line 27, in _get_grade_tree\n    str(grade_get_result.status_code))\nRuntimeError: Failed to fetch grade data for https://usosweb.mimuw.edu.pl/kontroler.php?_action=dla_stud/studia/sprawdziany/pokaz&wez_id=117291 with code 404\n"
+}
+```
 
 ## Usage
 
 The script is meant to be ran continously, so it is recommended to host the script somewhere in the web and launch
-it every 5-10 minutes to have up-to-date info about your grades. It also needs a PostreSQL database connected and
-manually initialized with empty lists. The scripts execution time depends on connection delays to USOSWeb and the database,
-and in practice it takes about 20-30 seconds to complete with 4 courses defined (the course GETs seem to take the most
-time).
+it every 5-10 minutes to have up-to-date info about your grades. It also needs a PostreSQL database connected. The script's execution time depends on connection delays to USOSWeb and the database, and in practice it takes about 20-30 seconds to complete with 4 courses defined (the course GETs seem to take the most time).
