@@ -24,7 +24,7 @@ class DataManager:
 
         if not grade_get_result.ok:
             raise RuntimeError('Failed to fetch grade data for ' + url + ' with code ' +
-                               str(grade_get_result().status_code))
+                               str(grade_get_result.status_code))
 
         self._logger.log('Fetched grades from ' + str(url) + '.')
 
