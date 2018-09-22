@@ -10,8 +10,6 @@ A small Python script I wrote for automatization of USOSWeb checking for new gra
 
 The script is configured in two places. 
 
-The first one is `config.ini`, which contains HTTP actions for 
-logging in and out from the USOSWeb in the AUTHORIZATION group, and then course definitions in GRADES group.
 A course definition is a key-value mapping, where the key is an alias for the courses name used in notifications,
 and the value is a GET action yielding the grades page from USOSWeb (see images).
 
@@ -25,6 +23,9 @@ The second one is environment variables. The script expects the following enviro
 - `NOTIFIER_USERNAME` - login to a notifier-bot SMTP account;
 - `NOTIFIER_PASSWORD` - password to a notifier-bot SMTP account;
 - `DATABASE_URL` - connection string to a PostgreSQL database.
+- `GRADES_[id]` - Course definitions. Every entry should begin with the `GRADES_` prefix and be followed by a unique ID,
+which will be used in the database and in notifications. 
+The value is a GET action yielding the grades page from USOSWeb (see images).
 
 ## Database
 

@@ -1,5 +1,8 @@
 from lxml import html
-import os
+
+LOGIN_POST = 'https://logowanie.uw.edu.pl/cas/login'
+LOGIN_GET = 'https://usosweb.mimuw.edu.pl/kontroler.php?_action=logowaniecas/index'
+LOGOUT_GET = 'https://usosweb.mimuw.edu.pl/kontroler.php?_action=logowaniecas/wyloguj'
 
 
 class Authorizer:
@@ -28,7 +31,7 @@ class Authorizer:
         self._login_payload['username'] = username
         self._login_payload['password'] = password
 
-        login_get_result = self._session.get(os.environ['LOGIN_GET'])
+        login_get_result = self._session.get(LOGIN_GET)
 
         get_result_tree = html.fromstring(login_get_result.content)
 
@@ -39,7 +42,7 @@ class Authorizer:
 
         self._login_payload['lt'] = ticket[0]
 
-        login_post_result = self._session.post(os.environ['LOGIN_POST'], data=self._login_payload)
+        login_post_result = self._session.post(LOGIN_POST, data=self._login_payload)
 
         post_result_tree = html.fromstring(login_post_result.content)
 
@@ -47,4 +50,4 @@ class Authorizer:
             raise RuntimeError("Login attempt failed.")
 
     def logout(self):
-        self._session.get(os.environ['LOGOUT_GET'])
+        self._session.get(LOGOUT_GET)
