@@ -11,6 +11,8 @@ def main():
     logger = Logger()
     authorizer = None
 
+    print("Random stuff.")
+
     try:
         
         notifier = Notifier(os.environ['RECEIVER_EMAIL'], logger)
