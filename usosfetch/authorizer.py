@@ -1,5 +1,5 @@
 from lxml import html
-from configparser import ConfigParser
+import os
 
 
 class Authorizer:
@@ -20,10 +20,6 @@ class Authorizer:
     def __init__(self, session):
         self._session = session
 
-        config = ConfigParser()
-        config.read('usosfetch/config.ini')
-        self._urls = config['AUTHORIZATION']
-
     @staticmethod
     def _is_success(tree):
         return not bool(tree.xpath('//body[@id="cas"]'))
@@ -32,7 +28,7 @@ class Authorizer:
         self._login_payload['username'] = username
         self._login_payload['password'] = password
 
-        login_get_result = self._session.get(self._urls['LOGIN_GET'])
+        login_get_result = self._session.get(os.environ['LOGIN_GET'])
 
         get_result_tree = html.fromstring(login_get_result.content)
 
@@ -43,7 +39,7 @@ class Authorizer:
 
         self._login_payload['lt'] = ticket[0]
 
-        login_post_result = self._session.post(self._urls['LOGIN_POST'], data=self._login_payload)
+        login_post_result = self._session.post(os.environ['LOGIN_POST'], data=self._login_payload)
 
         post_result_tree = html.fromstring(login_post_result.content)
 
@@ -51,4 +47,4 @@ class Authorizer:
             raise RuntimeError("Login attempt failed.")
 
     def logout(self):
-        self._session.get(self._urls['LOGOUT_GET'])
+        self._session.get(os.environ['LOGOUT_GET'])

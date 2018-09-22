@@ -1,8 +1,10 @@
 from lxml import html
 import json
-import configparser
 import psycopg2
 import os
+import re
+
+GRADES_PREFIX = 'GRADES_'
 
 
 class DataManager:
@@ -15,9 +17,12 @@ class DataManager:
         self._session = session
         self._logger = logger
 
-        config = configparser.ConfigParser()
-        config.read('usosfetch/config.ini')
-        self._urls = config.items('GRADES')
+        self._urls = self._get_grades_config()
+
+    @staticmethod
+    def _get_grades_config():
+        return {(k[len(GRADES_PREFIX):].lower(), v) for (k, v) in os.environ.items()
+                if re.match('^' + GRADES_PREFIX + '.*', k) is not None}
 
     def _get_grade_tree(self, url):
         grade_get_result = self._session.get(url)
