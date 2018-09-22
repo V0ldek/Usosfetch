@@ -2,7 +2,7 @@ import requests
 import os
 import traceback
 from usosfetch.authorizer import Authorizer
-from usosfetch.data_manager import DataManager
+from usosfetch.data_manager import GradesManager
 from usosfetch.notifier import Notifier
 from usosfetch.logger import Logger
 
@@ -19,7 +19,7 @@ def main():
         with requests.Session() as session:
 
             authorizer = Authorizer(session)
-            data_manager = DataManager(session, logger)
+            data_manager = GradesManager(session, logger)
 
             authorizer.login(os.environ["USOS_USERNAME"], os.environ["USOS_PASSWORD"])
 
