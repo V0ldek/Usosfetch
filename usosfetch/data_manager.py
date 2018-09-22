@@ -7,7 +7,7 @@ import re
 GRADES_PREFIX = 'GRADES_'
 
 
-class DataManager:
+class GradesManager:
 
     _session = None
     _urls = None
