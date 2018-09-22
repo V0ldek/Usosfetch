@@ -12,8 +12,7 @@ def main():
     authorizer = None
 
     try:
-        logger.begin_session()
-
+        
         notifier = Notifier(os.environ['RECEIVER_EMAIL'], logger)
 
         with requests.Session() as session:
