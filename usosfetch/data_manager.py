@@ -24,24 +24,25 @@ class GradesManager:
         return {(k[len(GRADES_PREFIX):].lower(), v) for (k, v) in os.environ.items()
                 if re.match('^' + GRADES_PREFIX + '.*', k) is not None}
 
-    def _get_grade_tree(self, url):
-        grade_get_result = self._session.get(url)
+    def _get_grade_tree_request(self, name, url):
+        self._logger.log('Fetching grades for ' + name + ' from ' + str(url) + '...')
 
-        if not grade_get_result.ok:
-            raise RuntimeError('Failed to fetch grade data for ' + url + ' with code ' +
-                               str(grade_get_result.status_code))
+        return self._session.get(url)
 
-        self._logger.log('Fetched grades from ' + str(url) + '.')
+    def _get_grade_tree_from_request(self, name, request):
 
-        return html.fromstring(grade_get_result.content)
+        if not request.ok:
+            raise RuntimeError('Failed to fetch grade data for ' + name + 'with code ' +
+                               str(request.status_code))
+
+        self._logger.log('Fetched grades for ' + name + '.')
+
+        return html.fromstring(request.content)
 
     def _get_grade_trees(self):
-        trees = []
+        requests = {(n, self._get_grade_tree_request(n, u)) for (n, u) in self._urls}
 
-        for (name, url) in self._urls:
-            trees.append((name, self._get_grade_tree(url)))
-
-        return trees
+        return {(n, self._get_grade_tree_from_request(n, r.result())) for (n, r) in requests}
 
     @staticmethod
     def _parse_grade_tree(tree):

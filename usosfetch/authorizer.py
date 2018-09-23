@@ -31,7 +31,7 @@ class Authorizer:
         self._login_payload['username'] = username
         self._login_payload['password'] = password
 
-        login_get_result = self._session.get(LOGIN_GET)
+        login_get_result = self._session.get(LOGIN_GET).result()
 
         get_result_tree = html.fromstring(login_get_result.content)
 
@@ -42,7 +42,7 @@ class Authorizer:
 
         self._login_payload['lt'] = ticket[0]
 
-        login_post_result = self._session.post(LOGIN_POST, data=self._login_payload)
+        login_post_result = self._session.post(LOGIN_POST, data=self._login_payload).result()
 
         post_result_tree = html.fromstring(login_post_result.content)
 
@@ -50,4 +50,4 @@ class Authorizer:
             raise RuntimeError("Login attempt failed.")
 
     def logout(self):
-        self._session.get(LOGOUT_GET)
+        self._session.get(LOGOUT_GET).result()
