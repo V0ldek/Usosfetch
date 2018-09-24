@@ -32,4 +32,5 @@ class Logger:
 
             row = json.dumps(self._log, sort_keys=True, indent=4, separators=(',', ': '))
 
-            cursor.execute("""INSERT INTO logs (log, is_error) VALUES (%s, %s)""", (row, self._is_error))
+            cursor.execute("""INSERT INTO logs (log, is_error, timestamp) VALUES (%s, %s, %s)""",
+                           (row, self._is_error, datetime.now()))
