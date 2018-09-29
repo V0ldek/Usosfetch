@@ -22,7 +22,8 @@ The second one is environment variables. The script expects the following enviro
 - `SMTP_PORT` - port for the SMTP host used to push notifications;
 - `NOTIFIER_USERNAME` - login to a notifier-bot SMTP account;
 - `NOTIFIER_PASSWORD` - password to a notifier-bot SMTP account;
-- `DATABASE_URL` - connection string to a PostgreSQL database.
+- `DATABASE_URL` - connection string to a PostgreSQL database;
+- `LOG_EXPIRATION_DAYS` - number of days after which logs are deleted from the database;
 - `GRADES_[id]` - Course definitions. Every entry should begin with the `GRADES_` prefix and be followed by a unique ID,
 which will be used in the database and in notifications. 
 The value is a GET action yielding the grades page from USOSWeb (see images).
@@ -33,9 +34,11 @@ The database has to accessible via psycopg2 (so PostgreSQL). The script expects 
 The table `grades` has two columns:
 - `id` - unique `PK`, not null, `VARCHAR` corresponding to the course definition's key in `config.ini`;
 - `list` - not null, `VARCHAR` that represents a JSON list of all grades in the format mentioned below.
-The table `logs` also has two columns:
+The table `logs` has four columns:
 - `id` - unique `PK`, not null, `INT` with auto-increment;
-- `log` - not null, `VARCHAR` representing the log. The logs might exceed a couple thousand characters.
+- `log` - not null, `VARCHAR` representing the log. The logs might exceed a couple thousand characters;
+- `is_error` - not null, `BOOLEAN`, `TRUE` if the log represents a runtime error, `FALSE` otherwise;
+- `timestamp` - not null, `TIMESTAMP`.
 
 ## Behaviour
 
