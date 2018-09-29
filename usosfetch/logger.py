@@ -34,3 +34,12 @@ class Logger:
 
             cursor.execute("""INSERT INTO logs (log, is_error, timestamp) VALUES (%s, %s, %s)""",
                            (row, self._is_error, datetime.now()))
+
+    def clear_old_logs(self):
+
+        with psycopg2.connect(os.environ['DATABASE_URL'], sslmode='require') as db, db.cursor() as cursor:
+
+            cursor.execute("""DELETE FROM logs WHERE timestamp < now() - INTERVAL %s""",
+                           ("'" + os.environ['LOG_EXPIRATION_DAYS'] + " days'",))
+
+            self.log('Deleted ' + str(cursor.rowcount) + ' old logs.')

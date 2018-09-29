@@ -54,4 +54,5 @@ def main():
             if authorizer is not None:
                 authorizer.logout()
             if logger is not None:
+                logger.clear_old_logs()
                 logger.save_to_database()
