@@ -8,12 +8,7 @@ A small Python script I wrote for automatization of USOSWeb checking for new gra
 
 ## Configuration
 
-The script is configured in two places. 
-
-A course definition is a key-value mapping, where the key is an alias for the courses name used in notifications,
-and the value is a GET action yielding the grades page from USOSWeb (see images).
-
-The second one is environment variables. The script expects the following environment variables (under `os.environ`):
+The script is configured using environment variables (under `os.environ`):
 
 - `USOS_USERNAME` - login for CAS authorization;
 - `USOS_PASSWORD` - password for CAS authorization;
@@ -42,7 +37,7 @@ The table `logs` has four columns:
 
 ## Behaviour
 
-The script is not exactly the smartest. It makes a lot of assumptions about the webpage it's used on
+The script is not exactly the smartest (it's a webscraper). It makes a lot of assumptions about the webpage it's used on
 (since my intention wasn't really to use it for anything else than to satisfy my own laziness in checking the 
 USOSWeb webpages for my grades). The script performs the following steps:
 
