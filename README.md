@@ -1,4 +1,7 @@
-# Usosfetch
+# Usosfetch _DEPRECATED_
+
+**DEPRECATION: Somewhere in November 2019, the Mobile USOS app got an update that added automatic notifications when your grades are updated. They are near-real-time and also show what test and how many points you got in the notification itself. Since they are strictly better than Usosfetch's notifications, Usosfetch is now obsolete and will no longer be supported (at least as long as Mobile USOS works). You can get [Mobile USOS in Google Play](https://play.google.com/store/apps/details?id=pl.edu.uw.mobilny).**
+
 A Python script pushing email notifications for grade changes on USOSWeb.
 
 Copyright (C) Mateusz Gienieczko 2018.
